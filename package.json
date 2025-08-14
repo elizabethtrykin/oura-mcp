@@ -1,11 +1,11 @@
 {
-  "name": "mcp",
+  "name": "@elizabethtrykin/oura-mcp",
   "version": "1.0.0",
-  "main": "index.js",
-  "keywords": [],
+  "main": "build/index.js",
+  "keywords": ["oura", "mcp", "modelcontextprotocol"],
   "author": "",
   "license": "ISC",
-  "description": "",
+  "description": "MCP server for Oura Ring API",
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.7.0",
     "dotenv": "^16.4.7",
@@ -20,7 +20,7 @@
   },
   "type": "module",
   "bin": {
-    "weather": "./build/index.js"
+    "oura-mcp": "./build/index.js"
   },
   "scripts": {
     "build": "tsc && chmod 755 build/index.js",
