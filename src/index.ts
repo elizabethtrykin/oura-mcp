@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 import { config as dotenvConfig } from 'dotenv';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { OuraProvider } from './provider/oura_provider.js';
