@@ -1,20 +1,19 @@
 # Oura MCP Server
 
-A Model Context Protocol (MCP) server for accessing Oura Ring data.
+A Model Context Protocol (MCP) server for accessing Oura Ring health and biometric data.
 
 ## Setup
 
 ### Prerequisites
-- Node.js (v16+)
+- [Bun](https://bun.sh/) (v1+) or Node.js (v18+)
 - Oura account
 
 ### Installation
-1. Clone the repository
-2. Run: 
+```bash
+bun install
+bun run build
 ```
-npm install
-npm run build
-```
+
 ## Configuration
 
 ### Obtaining Credentials
@@ -35,45 +34,99 @@ OURA_CLIENT_SECRET=your_client_secret
 OURA_REDIRECT_URI=http://localhost:3000/callback
 ```
 
-## Usage
+## Integration
 
-### Testing
-```
-node test.js <tool_name> <date>
-```
-Example: `node test.js get_daily_sleep 2023-05-01`
+### Claude Desktop
 
-### Claude Desktop Integration
-Add to Claude Desktop's config (Settings → Developer → Edit Config):
+Add to Claude Desktop config (Settings > Developer > Edit Config):
+
+**macOS:** `~/Library/Application Support/Claude/claude_desktop_config.json`
+**Windows:** `%APPDATA%\Claude\claude_desktop_config.json`
+
 ```json
 {
     "mcpServers": {
         "oura": {
-            "command": "node",
-            "args": ["/absolute/path/to/oura-mcp/build/index.js"],
+            "command": "bun",
+            "args": ["run", "/absolute/path/to/oura-mcp/build/index.js"],
             "env": {"OURA_PERSONAL_ACCESS_TOKEN": "your_token"}
         }
     }
 }
 ```
+
 Restart Claude Desktop after saving. See [MCP docs](https://modelcontextprotocol.io/quickstart/user) for details.
 
+### Claude Code (CLI)
+
+```bash
+claude mcp add oura -s user -- bun run /absolute/path/to/oura-mcp/build/index.js
+```
+
+Set your token in the shell environment:
+```bash
+export OURA_PERSONAL_ACCESS_TOKEN=your_token
+```
+
+Or the server will load it from the `.env` file in the project directory.
+
+### Remote HTTP Deployment
+
+Start in HTTP mode:
+```bash
+# Direct
+bun run start:http
+
+# Or with environment variables
+MCP_TRANSPORT=http MCP_PORT=3000 bun run build/index.js --http
+```
+
+**Docker:**
+```bash
+export OURA_PERSONAL_ACCESS_TOKEN=your_token
+docker compose up -d
+```
+
+The HTTP server exposes:
+- `POST /mcp` — MCP protocol endpoint
+- `GET /mcp` — SSE streaming endpoint
+- `DELETE /mcp` — session cleanup
+- `GET /health` — health check
+
+Optional: set `MCP_API_KEY` to require `Authorization: Bearer <key>` on all `/mcp` requests.
+
+## Development
+
+```bash
+# Run directly from TypeScript (no build step)
+bun run dev
+
+# Run HTTP mode from TypeScript
+bun run dev:http
+
+# Build
+bun run build
+
+# Test
+bun test
+```
+
 ## Available Resources
-- `personal_info` - User profile
-- `daily_activity` - Activity summaries
-- `daily_readiness` - Readiness scores
-- `daily_sleep` - Sleep summaries
-- `sleep` - Detailed sleep data
-- `sleep_time` - Sleep timing
-- `workout` - Workout data
-- `session` - Session data
-- `daily_spo2` - SpO2 measurements
-- `rest_mode_period` - Rest periods
-- `ring_configuration` - Ring config
-- `daily_stress` - Stress metrics
-- `daily_resilience` - Resilience metrics
-- `daily_cardiovascular_age` - CV age
-- `vO2_max` - VO2 max data
+- `personal_info` — User profile
+- `daily_activity` — Activity summaries
+- `daily_readiness` — Readiness scores
+- `daily_sleep` — Sleep summaries
+- `sleep` — Detailed sleep data
+- `sleep_time` — Sleep timing
+- `workout` — Workout data
+- `session` — Session data
+- `daily_spo2` — SpO2 measurements
+- `rest_mode_period` — Rest periods
+- `ring_configuration` — Ring config
+- `daily_stress` — Stress metrics
+- `daily_resilience` — Resilience metrics
+- `daily_cardiovascular_age` — CV age
+- `vO2_max` — VO2 max data
 
 ## Available Tools
-For date-based resources, use tools like `get_daily_sleep` with `startDate` and `endDate` parameters (YYYY-MM-DD). 
+For date-based resources, use tools like `get_daily_sleep` with `startDate` and `endDate` parameters (YYYY-MM-DD).

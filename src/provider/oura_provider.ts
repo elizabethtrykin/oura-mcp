@@ -57,12 +57,6 @@ export class OuraProvider {
   }
 
   private initializeResources(): void {
-    // Define the date range schema for tools
-    const dateRangeSchema = {
-      startDate: z.string(),
-      endDate: z.string()
-    };
-
     // Add resources and tools for each endpoint
     const endpoints = [
       { name: 'personal_info', requiresDates: false },
@@ -108,12 +102,13 @@ export class OuraProvider {
       );
     });
 
-    // Add tools
+    // Add tools — cast needed to work around deep type instantiation in McpServer.tool() generics
+    const server = this.server as any;
     endpoints.filter(e => e.requiresDates).forEach(({ name }) => {
-      this.server.tool(
+      server.tool(
         `get_${name}`,
-        dateRangeSchema,
-        async ({ startDate, endDate }) => {
+        { startDate: z.string(), endDate: z.string() },
+        async ({ startDate, endDate }: { startDate: string; endDate: string }) => {
           const data = await this.fetchOuraData(name, {
             start_date: startDate,
             end_date: endDate
@@ -121,7 +116,7 @@ export class OuraProvider {
 
           return {
             content: [{
-              type: "text",
+              type: "text" as const,
               text: JSON.stringify(data, null, 2)
             }]
           };

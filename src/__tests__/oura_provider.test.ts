@@ -31,18 +31,10 @@ describe('OuraProvider', () => {
       }
     });
 
-    client = new Client(
-      {
-        name: 'test-client',
-        version: '1.0.0',
-      },
-      {
-        capabilities: {
-          resources: {},
-          tools: {},
-        },
-      }
-    );
+    client = new Client({
+      name: 'test-client',
+      version: '1.0.0',
+    });
 
     await client.connect(transport);
   });
@@ -69,7 +61,7 @@ describe('OuraProvider', () => {
     const tools = await client.listTools();
     expect(tools).toContainEqual(
       expect.objectContaining({
-        name: 'get_sleep_data',
+        name: 'get_sleep',
       })
     );
   });
@@ -83,7 +75,7 @@ describe('OuraProvider', () => {
 
   it('should get sleep data', async () => {
     const result = await client.callTool({
-      name: 'get_sleep_data',
+      name: 'get_sleep',
       arguments: {
         startDate: '2024-03-14',
         endDate: '2024-03-15',

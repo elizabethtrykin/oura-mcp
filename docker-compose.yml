@@ -1,0 +1,10 @@
+services:
+  oura-mcp:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      - OURA_PERSONAL_ACCESS_TOKEN=${OURA_PERSONAL_ACCESS_TOKEN}
+      - MCP_TRANSPORT=http
+      - MCP_PORT=3000
+    restart: unless-stopped
