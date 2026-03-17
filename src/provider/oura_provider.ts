@@ -59,27 +59,27 @@ export class OuraProvider {
   private initializeResources(): void {
     // Define the date range schema for tools
     const dateRangeSchema = {
-      startDate: z.string(),
-      endDate: z.string()
+      startDate: z.string().describe("Start date in YYYY-MM-DD format"),
+      endDate: z.string().describe("End date in YYYY-MM-DD format")
     };
 
     // Add resources and tools for each endpoint
     const endpoints = [
-      { name: 'personal_info', requiresDates: false },
-      { name: 'daily_activity', requiresDates: true },
-      { name: 'daily_readiness', requiresDates: true },
-      { name: 'daily_sleep', requiresDates: true },
-      { name: 'sleep', requiresDates: true },
-      { name: 'sleep_time', requiresDates: true },
-      { name: 'workout', requiresDates: true },
-      { name: 'session', requiresDates: true },
-      { name: 'daily_spo2', requiresDates: true },
-      { name: 'rest_mode_period', requiresDates: true },
-      { name: 'ring_configuration', requiresDates: false },
-      { name: 'daily_stress', requiresDates: true },
-      { name: 'daily_resilience', requiresDates: true },
-      { name: 'daily_cardiovascular_age', requiresDates: true },
-      { name: 'vO2_max', requiresDates: true }
+      { name: 'personal_info', requiresDates: false, description: 'Get personal info (age, weight, height, etc.)' },
+      { name: 'daily_activity', requiresDates: true, description: 'Get daily activity data (steps, calories, movement, etc.)' },
+      { name: 'daily_readiness', requiresDates: true, description: 'Get daily readiness score and contributors' },
+      { name: 'daily_sleep', requiresDates: true, description: 'Get daily sleep score and contributors' },
+      { name: 'sleep', requiresDates: true, description: 'Get detailed sleep period data (stages, HR, HRV, etc.)' },
+      { name: 'sleep_time', requiresDates: true, description: 'Get recommended sleep time windows' },
+      { name: 'workout', requiresDates: true, description: 'Get workout sessions (type, duration, intensity, etc.)' },
+      { name: 'session', requiresDates: true, description: 'Get relaxation/meditation session data' },
+      { name: 'daily_spo2', requiresDates: true, description: 'Get daily blood oxygen (SpO2) readings' },
+      { name: 'rest_mode_period', requiresDates: true, description: 'Get rest mode periods and recovery data' },
+      { name: 'ring_configuration', requiresDates: false, description: 'Get Oura ring hardware configuration' },
+      { name: 'daily_stress', requiresDates: true, description: 'Get daily stress levels and recovery data' },
+      { name: 'daily_resilience', requiresDates: true, description: 'Get daily resilience score and contributors' },
+      { name: 'daily_cardiovascular_age', requiresDates: true, description: 'Get estimated cardiovascular age' },
+      { name: 'vO2_max', requiresDates: true, description: 'Get estimated VO2 max values' }
     ];
 
     // Add resources
@@ -109,9 +109,10 @@ export class OuraProvider {
     });
 
     // Add tools
-    endpoints.filter(e => e.requiresDates).forEach(({ name }) => {
+    endpoints.filter(e => e.requiresDates).forEach(({ name, description }) => {
       this.server.tool(
         `get_${name}`,
+        description,
         dateRangeSchema,
         async ({ startDate, endDate }) => {
           const data = await this.fetchOuraData(name, {
